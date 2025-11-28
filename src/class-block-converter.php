@@ -69,6 +69,11 @@ class Block_Converter {
 			}
 
 			// Merge the block into the HTML collection.
+			$skip_minify_block = apply_filters( 'wp_block_converter_skip_minify_block', false, $node );
+			if ( $skip_minify_block ) {
+				$html[] = (string) $this->convert_node( $node );
+				continue;
+			}
 			$html[] = $this->minify_block( (string) $this->convert_node( $node ) );
 		}
 
@@ -255,7 +260,12 @@ class Block_Converter {
 			$child_block = $this->convert_node( $child );
 
 			if ( ! empty( $child_block ) ) {
-				$children .= $this->minify_block( (string) $child_block );
+				$skip_minify_block = apply_filters( 'wp_block_converter_skip_minify_block', false, $child );
+				if ( $skip_minify_block ) {
+					$children .= (string) $child_block;
+				} else {
+					$children .= $this->minify_block( (string) $child_block );
+				}
 			}
 		}
 
